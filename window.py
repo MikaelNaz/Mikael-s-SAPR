@@ -21,7 +21,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 1021, 681))
+        self.tabWidget.setGeometry(QtCore.QRect(10, 0, 1021, 681))
         self.tabWidget.setDocumentMode(True)
         self.tabWidget.setTabsClosable(False)
         self.tabWidget.setMovable(False)
@@ -163,6 +163,68 @@ class Ui_MainWindow(object):
 "")
         self.processor.setObjectName("processor")
         self.tabWidget.addTab(self.Draw, "")
+        self.tab_2 = QtWidgets.QWidget()
+        self.tab_2.setObjectName("tab_2")
+        self.graphicsView_2 = QtWidgets.QGraphicsView(self.tab_2)
+        self.graphicsView_2.setGeometry(QtCore.QRect(10, 80, 1001, 551))
+        self.graphicsView_2.setObjectName("graphicsView_2")
+        self.kernel_6 = QtWidgets.QLabel(self.tab_2)
+        self.kernel_6.setGeometry(QtCore.QRect(280, 0, 531, 61))
+        self.kernel_6.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.kernel_6.setStyleSheet("background-color: rgba(255, 255, 255, 30);\n"
+"font: 22pt \"Times New Roman\";\n"
+"border: 1px solid rgba(255, 255, 255, 40);\n"
+"border-radius: 7px")
+        self.kernel_6.setAlignment(QtCore.Qt.AlignCenter)
+        self.kernel_6.setObjectName("kernel_6")
+        self.draw_button_2 = QtWidgets.QPushButton(self.tab_2)
+        self.draw_button_2.setGeometry(QtCore.QRect(10, 10, 161, 71))
+        font = QtGui.QFont()
+        font.setPointSize(18)
+        font.setBold(True)
+        font.setItalic(False)
+        self.draw_button_2.setFont(font)
+        self.draw_button_2.setStyleSheet("QPushButton {\n"
+"    background-color: qconicalgradient(cx:0, cy:0, angle:135, stop:0 rgba(255, 255, 0, 69), stop:0.375 rgba(255, 255, 0, 69), stop:0.423533 rgba(251, 255, 0, 145), stop:0.45 rgba(247, 255, 0, 208), stop:0.477581 rgba(255, 244, 71, 130), stop:0.518717 rgba(255, 218, 71, 130), stop:0.55 rgba(255, 255, 0, 255), stop:0.57754 rgba(255, 203, 0, 130), stop:0.625 rgba(255, 255, 0, 69), stop:1 rgba(255, 255, 0, 69));\n"
+"   border: 1px solid gray;\n"
+"}\n"
+"QPushButton:pressed {\n"
+"    background-color: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1,\n"
+"                                      stop: 0 #dadbde, stop: 1 #f6f7fa);\n"
+"}\n"
+"")
+        self.draw_button_2.setObjectName("draw_button_2")
+        self.tabWidget.addTab(self.tab_2, "")
+        self.tab_3 = QtWidgets.QWidget()
+        self.tab_3.setObjectName("tab_3")
+        self.graphicsView_3 = QtWidgets.QGraphicsView(self.tab_3)
+        self.graphicsView_3.setGeometry(QtCore.QRect(10, 80, 1001, 551))
+        self.graphicsView_3.setObjectName("graphicsView_3")
+        self.kernel_7 = QtWidgets.QLabel(self.tab_3)
+        self.kernel_7.setGeometry(QtCore.QRect(280, 0, 531, 61))
+        self.kernel_7.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.kernel_7.setStyleSheet("background-color: rgba(255, 255, 255, 30);\n"
+"font: 22pt \"Times New Roman\";\n"
+"border: 1px solid rgba(255, 255, 255, 40);\n"
+"border-radius: 7px")
+        self.kernel_7.setAlignment(QtCore.Qt.AlignCenter)
+        self.kernel_7.setObjectName("kernel_7")
+        self.tabWidget.addTab(self.tab_3, "")
+        self.tab_4 = QtWidgets.QWidget()
+        self.tab_4.setObjectName("tab_4")
+        self.kernel_8 = QtWidgets.QLabel(self.tab_4)
+        self.kernel_8.setGeometry(QtCore.QRect(280, 0, 531, 61))
+        self.kernel_8.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.kernel_8.setStyleSheet("background-color: rgba(255, 255, 255, 30);\n"
+"font: 22pt \"Times New Roman\";\n"
+"border: 1px solid rgba(255, 255, 255, 40);\n"
+"border-radius: 7px")
+        self.kernel_8.setAlignment(QtCore.Qt.AlignCenter)
+        self.kernel_8.setObjectName("kernel_8")
+        self.graphicsView_4 = QtWidgets.QGraphicsView(self.tab_4)
+        self.graphicsView_4.setGeometry(QtCore.QRect(10, 80, 1001, 551))
+        self.graphicsView_4.setObjectName("graphicsView_4")
+        self.tabWidget.addTab(self.tab_4, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.tableView_2 = QtWidgets.QTableView(self.tab)
@@ -236,6 +298,13 @@ class Ui_MainWindow(object):
         self.zoom_2.setText(_translate("MainWindow", "Уменьшить"))
         self.processor.setText(_translate("MainWindow", "Расчеты"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.Draw), _translate("MainWindow", "Отрисовка"))
+        self.kernel_6.setText(_translate("MainWindow", "Продольная сила"))
+        self.draw_button_2.setText(_translate("MainWindow", "Отрисовка"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "Эпюра Nx"))
+        self.kernel_7.setText(_translate("MainWindow", "Перемещение"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_3), _translate("MainWindow", "Эпюра Ux"))
+        self.kernel_8.setText(_translate("MainWindow", "Нормальное напряжение"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("MainWindow", "Эпюра σx"))
         self.kernel_2.setText(_translate("MainWindow", "Результаты расчетов"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("MainWindow", "Таблица результатов расчета"))
         self.menu.setTitle(_translate("MainWindow", "Файл"))

@@ -2,15 +2,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem, QTableView, QVBoxLayout, QApplication, QFileDialog
 from PyQt5.QtGui import QStandardItemModel, QPen, QColor, QBrush, QPainter, QStandardItem
 from PyQt5.QtCore import Qt
+import pyqtgraph as pg
 from window import Ui_MainWindow
 import sys
 import os
 import re
 import numpy as np
-
-
-
-
 # import cv2
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -24,7 +21,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.opora_left.stateChanged.connect(self.get_opora_left)
         self.ui.opora_right.stateChanged.connect(self.get_opora_right)
         self.ui.draw_button.clicked.connect(self.draw_rectangles)
+        self.ui.draw_button_2.clicked.connect(self.draw_diagrams)
         self.ui.graphicsView.setScene(QtWidgets.QGraphicsScene())
+        self.ui.graphicsView_2.setScene(QtWidgets.QGraphicsScene())
         self.ui.open_1.clicked.connect(self.open_table_data)
         self.ui.action_5.triggered.connect(self.close)
         self.ui.processor.clicked.connect(self.processor)
@@ -37,8 +36,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tableView_2(self.ui.tableView_2, ["Данные", "Результат"])
         self.ui.tableView_2.setColumnWidth(0, 495)
         self.ui.tableView_2.setColumnWidth(1, 495)
-
-
 
 
     def wheelEvent(self, event):
@@ -173,7 +170,6 @@ class MainWindow(QtWidgets.QMainWindow):
     #     self.setWindowTitle(self.title)
     #     self.setGeometry(self.top, self.left, self.width, self.height)
     #     self.show()
-
 
 
     def draw_rectangles(self):
@@ -454,9 +450,9 @@ class MainWindow(QtWidgets.QMainWindow):
         data = self.get_table_data(self.ui.tableView)
         count = len(data)
         sum = self.vector_delta()
-        point_count = 6
-        # N = np.zeros((count, point_count))
-        N = np.zeros((count, 2))
+        point_count = 100
+        N = np.zeros((count, point_count))
+        # N = np.zeros((count, 2))
 
         for i in range(len(data)):
             area = float(data[i][0])
@@ -466,45 +462,27 @@ class MainWindow(QtWidgets.QMainWindow):
             first_node = float(data[0][4])
             concentrated_forces = float(data[i][5])  # сосредоточенные силы
             distributed_forces = float(data[i][6])  # распределенные силы
-            a = (sum[i + 1] - sum[i])
-
-            N[i][0] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * 0) / length))
-            N[i][1] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * length) / length))
-            # elif distributed_forces < 0:
-            #     N[i][0] = ((module * area) / length) * a - ((voltage * length) / 2) * (1 - ((2 * 0) / length))
-            #     N[i][1] = ((module * area) / length) * a - ((voltage * length) / 2) * (1 - ((2 * length) / length))
-            if distributed_forces == 0:
-                N[i][0] = ((module * area) / length) * a
-                N[i][1] = ((module * area) / length) * a
-
-            # if distributed_forces > 0:
-            #     N[i][0] = ((module * area) / length) * a + ((voltage * length) / 2) * (1 - ((2 * 0) / length))
-            #     N[i][1] = ((module * area) / length) * a + ((voltage * length) / 2) * (1 - ((2 * length) / length))
-            # elif distributed_forces < 0:
-            #     N[i][0] = ((module * area) / length) * a - ((voltage * length) / 2) * (1 - ((2 * 0) / length))
-            #     N[i][1] = ((module * area) / length) * a - ((voltage * length) / 2) * (1 - ((2 * length) / length))
-            # else:
+            # a = (sum[i + 1] - sum[i])
+            #
+            # N[i][0] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * 0) / length))
+            # N[i][1] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * length) / length))
+            #
+            # if distributed_forces == 0:
             #     N[i][0] = ((module * area) / length) * a
             #     N[i][1] = ((module * area) / length) * a
-
-            # for j in range(0, point_count):
-            #     a = (sum[i+1] - sum[i])
-            #     # print("Delta", a)
-            #     N[i][j] = ((module * area) / length) * a + ((2* voltage * length) / 2) * (1 - ((2 * j) / (point_count - 1)))
-            #     print("\nПеремещения: ", N)
-        # print("\nПеремещения : ", N)
+            for j in range(0, point_count):
+                a = (sum[i+1] - sum[i])
+                N[i][j] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * j) / (point_count - 1)))
         return N
 
     def normal_voltage(self):                                    # нормальное напряжение
         data = self.get_table_data(self.ui.tableView)
         count = len(data)
-        point_count = 6
         longitudinal_N = self.longitudinal_N()
-
         for i in range(len(data)):
             area = float(data[i][0])
-            longitudinal_N[i][0] /= area
-            longitudinal_N[i][1] /= area
+            longitudinal_N[i] /= area
+            longitudinal_N[i] /= area
 
         # print("\nНормальное напряжение σ: ", longitudinal_N)
         return longitudinal_N
@@ -515,10 +493,9 @@ class MainWindow(QtWidgets.QMainWindow):
         A = self.matrix()
         B = self.delta()
         sum = self.vector_delta()
-
-        point_count = 6
-        # N = np.zeros((count, point_count))
-        U = np.zeros((count, 2))
+        point_count = 100
+        U = np.zeros((count, point_count))
+        # U = np.zeros((count, 2))
 
         for i in range(len(data)):
             area = float(data[i][0])
@@ -528,59 +505,21 @@ class MainWindow(QtWidgets.QMainWindow):
             first_node = float(data[0][4])
             concentrated_forces = float(data[i][5])  # сосредоточенные силы
             distributed_forces = float(data[i][6])  # распределенные силы
-            a = (sum[i + 1] - sum[i])
 
-
-            U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * 0) / (2 * module * area * length)) * (1 - (0 / length))
-            U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * length) / (2 * module * area * length)) * (1 - (length / length))
-
-            if distributed_forces == 0:
-                U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i])
-                U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i])
-
-            # if distributed_forces > 0:
-            #     U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i]) + ((voltage * (length ** 2) * 0) / (2 * module * area * length)) * (1 - (0 / length))
-            #     U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i]) + ((voltage * (length ** 2) * length) / (2 * module * area * length)) * (1 - (length / length))
+            # a = (sum[i + 1] - sum[i])
+            # U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * 0) / (2 * module * area * length)) * (1 - (0 / length))
+            # U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * length) / (2 * module * area * length)) * (1 - (length / length))
             #
-            # elif distributed_forces < 0:
-            #     U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i]) + ((voltage * (length ** 2) * 0) / (2 * module * area * length)) * (1 - (0 / length))
-            #     U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i]) + ((voltage * (length ** 2) * length) / (2 * module * area * length)) * (1 - (length / length))
-            # else:
+            # if distributed_forces == 0:
             #     U[i][0] = sum[i] + (0 / length) * (sum[i + 1] - sum[i])
             #     U[i][1] = sum[i] + (length / length) * (sum[i + 1] - sum[i])
 
-            # for j in range(0, point_count):
-            #     a = (sum[i+1] - sum[i])
-            #     # print("Delta", a)
-            #     N[i][j] = ((module * area) / length) * a + ((2* voltage * length) / 2) * (1 - ((2 * j) / (point_count - 1)))
-            #     print("\nПеремещения: ", N)
-        # print("\nПеремещения U: ", U)
+            for j in range(0, point_count):
+                a = (sum[i+1] - sum[i])
+                U[i][j] = sum[i] + (j / (point_count - 1)) * (sum[i + 1] - sum[i]) + (
+                            (distributed_forces * voltage * (length ** 2) * j) / (2 * module * area * length)) * (
+                                      1 - (j / (point_count - 1)))
         return U
-
-    # def processor(self):
-    #     A = self.matrix()
-    #     B = self.delta()
-    #     SUM = self.vector_delta()
-    #     N = self.longitudinal_N()
-    #     longitudinal_N = self.normal_voltage()
-    #     U = self.movements_U()
-    #     if A == [[0]]:
-    #         QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете :)")
-    #     else:
-    #         print('Матрица реакций A: ', A)
-    #         print("\nГлобальный вектор реакций b:", B)
-    #         print("\nГлобальный вектор перемещений Δ:", SUM)
-    #         print("\nПеремещения N: ", N)
-    #         print("\nНормальное перемещение σ: ", longitudinal_N)
-    #         print("\nПеремещения U: ", U)
-    #         with open('results.txt', 'w', encoding='utf-8') as file:
-    #             file.write('Матрица реакций A: {}\n'.format(A))
-    #             file.write('Глобальный вектор реакций b: {}\n'.format(B))
-    #             file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-    #             file.write('Перемещения N: {}\n'.format(N))
-    #             file.write('Нормальное перемещение σ: {}\n'.format(longitudinal_N))
-    #             file.write('Перемещения U: {}\n'.format(U))
-    #     QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
     def processor(self):
         try:
@@ -588,7 +527,7 @@ class MainWindow(QtWidgets.QMainWindow):
             B = self.delta()
             SUM = self.vector_delta()
             N = self.longitudinal_N()
-            longitudinal_N = self.normal_voltage()
+            S = self.normal_voltage()
             U = self.movements_U()
             if A == [[0]]:
                 QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
@@ -597,31 +536,118 @@ class MainWindow(QtWidgets.QMainWindow):
                 print("\nГлобальный вектор реакций b:", B)
                 print("\nГлобальный вектор перемещений Δ:", SUM)
                 print("\nПеремещения N: ", N)
-                print("\nНормальное напряжение σ: ", longitudinal_N)
+                print("\nНормальныее напряжения σ: ", S)
                 print("\nПеремещения U: ", U)
                 # Запись результатов в таблицу
                 table_data = [
-                    ["Перемещения N", N],
-                    ["Нормальное напряжение σ", longitudinal_N],
-                    ["Перемещения U", U]
+                    ["Продольные силы N", ', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])],
+                    ["Нормальные напряжения σ", ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])],
+                    ["Перемещения U", ', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])]
                 ]
+
                 model = self.ui.tableView_2.model()
                 model.setRowCount(len(table_data))
                 for row, (header, value) in enumerate(table_data):
                     model.setData(model.index(row, 0), header, Qt.DisplayRole)
-                    model.setData(model.index(row, 1), str(value), Qt.DisplayRole)
+                    model.setData(model.index(row, 1), value, Qt.DisplayRole)
 
                 with open('results.txt', 'w', encoding='utf-8') as file:
                     file.write('Матрица реакций A: {}\n'.format(A))
                     file.write('Глобальный вектор реакций b: {}\n'.format(B))
                     file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-                    file.write('Перемещения N: {}\n'.format(N))
-                    file.write('Нормальное напряжение σ: {}\n'.format(longitudinal_N))
+                    file.write('Продольные силы N: {}\n'.format(N))
+                    file.write('Нормальные напряжения σ: {}\n'.format(S))
                     file.write('Перемещения U: {}\n'.format(U))
                     QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
         except Exception:
             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
+
+
+    # def draw_diagrams(self):
+    #     # x = [-1, -2, -3, 4, 5, 6, 7, 8, 9, 10]
+    #     # y = [-30, -32, -34, -32, -33, -31, -29, 32, 35, 45]
+    #     x = [0, 2]
+    #     y =[-1, -5]
+    #
+    #     scene = QtWidgets.QGraphicsScene()
+    #     plot_widget = pg.PlotWidget()
+    #     plot_widget.setBackground('w')
+    #     plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+    #
+    #     scene.addWidget(plot_widget)
+    #     self.ui.graphicsView_2.setScene(scene)
+
+    def draw_n(self):
+        data = self.get_table_data(self.ui.tableView)
+        x_start = 0
+        N = self.longitudinal_N()
+
+        scene = QtWidgets.QGraphicsScene()
+        plot_widget = pg.PlotWidget()
+        plot_widget.setBackground('w')
+
+        i = 0
+        for row in data:
+            length = float(row[1])
+            x = np.linspace(x_start, x_start + length, len(N[i]))
+            y = N[i]
+            plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            x_start += length
+            i += 1
+
+        scene.addWidget(plot_widget)
+        return self.ui.graphicsView_2.setScene(scene)
+
+    def draw_u(self):
+        data = self.get_table_data(self.ui.tableView)
+        x_start = 0
+        # N = self.longitudinal_N()
+        U = self.movements_U()
+
+        scene = QtWidgets.QGraphicsScene()
+        plot_widget = pg.PlotWidget()
+        plot_widget.setBackground('w')
+
+        i = 0
+        for row in data:
+            length = float(row[1])
+            x = np.linspace(x_start, x_start + length, len(U[i]))
+            y = U[i]
+            plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            x_start += length
+            i += 1
+
+        scene.addWidget(plot_widget)
+        self.ui.graphicsView_3.setScene(scene)
+
+    def draw_s(self):
+        data = self.get_table_data(self.ui.tableView)
+        x_start = 0
+        S = self.normal_voltage()
+
+        scene = QtWidgets.QGraphicsScene()
+        plot_widget = pg.PlotWidget()
+        plot_widget.setBackground('w')
+
+        i = 0
+        for row in data:
+            length = float(row[1])
+            x = np.linspace(x_start, x_start + length, len(S[i]))
+            y = S[i]
+            plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            x_start += length
+            i += 1
+
+        scene.addWidget(plot_widget)
+        self.ui.graphicsView_4.setScene(scene)
+
+    def draw_diagrams(self):
+        N = self.draw_n()
+        U = self.draw_u()
+        S = self.draw_s()
+
+
 
     def increase(self):
         QtWidgets.QMessageBox.critical(self, "Ошибка", "Я не хочу работать")
