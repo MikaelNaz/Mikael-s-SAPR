@@ -24,11 +24,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.draw_button_2.clicked.connect(self.draw_diagrams)
         self.ui.graphicsView.setScene(QtWidgets.QGraphicsScene())
         self.ui.graphicsView_2.setScene(QtWidgets.QGraphicsScene())
+        self.ui.graphicsView_3.setScene(QtWidgets.QGraphicsScene())
+        self.ui.graphicsView_4.setScene(QtWidgets.QGraphicsScene())
         self.ui.open_1.clicked.connect(self.open_table_data)
         self.ui.action_5.triggered.connect(self.close)
         self.ui.processor.clicked.connect(self.processor)
-        self.ui.zoom_1.clicked.connect(self.increase)
-        self.ui.zoom_2.clicked.connect(self.decrease)
+        # self.ui.zoom_1.clicked.connect(self.increase)
+        # self.ui.zoom_2.clicked.connect(self.decrease)
         self.ui.tableView.setColumnWidth(5, 150)
         self.ui.tableView.setColumnWidth(6, 200)
         self.opora_right_exists = False
@@ -36,7 +38,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tableView_2(self.ui.tableView_2, ["Данные", "Результат"])
         self.ui.tableView_2.setColumnWidth(0, 495)
         self.ui.tableView_2.setColumnWidth(1, 495)
-
+        self.point_line()
+        self.ui.get_point.clicked.connect(self.get_point_values)
 
     def wheelEvent(self, event):
         current_scale = self.ui.graphicsView.transform().m11()  # Получаем текущий масштаб вида
@@ -117,7 +120,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     data.append(row)
                 self.set_table_data(data, self.ui.tableView,
                                     ["Площадь сечения", "Длина", "Модуль упругости", "Напряжение", "Первый узел",
-                                     "Сосредоточенные силы", "Распределенный нагрузки"], self.ui.add_1,
+                                     "Сосредоточенные силы", "Распределенные нагрузки"], self.ui.add_1,
                                     self.ui.delete_1)
                 QtWidgets.QMessageBox.information(self, "Success", "CN data opened successfully!")
 
@@ -555,9 +558,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     file.write('Матрица реакций A: {}\n'.format(A))
                     file.write('Глобальный вектор реакций b: {}\n'.format(B))
                     file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-                    file.write('Продольные силы N: {}\n'.format(N))
-                    file.write('Нормальные напряжения σ: {}\n'.format(S))
-                    file.write('Перемещения U: {}\n'.format(U))
+                    file.write('Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
+                    file.write('Нормальные напряжения σ: {}\n'.format(', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
+                    file.write('Перемещения U: {}\n'.format(', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])))
                     QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
         except Exception:
@@ -643,10 +646,106 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.graphicsView_4.setScene(scene)
 
     def draw_diagrams(self):
-        N = self.draw_n()
-        U = self.draw_u()
-        S = self.draw_s()
+        try:
+            N = self.draw_n()
+            U = self.draw_u()
+            S = self.draw_s()
+        except Exception:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я не поддамся 🎈")
 
+    # def point_values(self, x):
+    #     data = self.get_table_data(self.ui.tableView)
+    #     count = len(data)
+    #     sum = self.vector_delta()
+    #     N = np.zeros((count, 1))
+    #     U = np.zeros((count, 1))
+    #     S = np.zeros((count, 1))
+    #     for i in range(len(data)):
+    #         area = float(data[i][0])
+    #         length = float(data[i][1])
+    #         module = float(data[i][2])
+    #         voltage = float(data[i][3])
+    #         first_node = float(data[0][4])
+    #         concentrated_forces = float(data[i][5])  # сосредоточенные силы
+    #         distributed_forces = float(data[i][6])  # распределенные силы
+    #
+    #         a = (sum[i + 1] - sum[i])
+    #         N[i][0] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * x) / length))
+    #         U[i][0] = sum[i] + (x / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * x) / (2 * module * area * length)) * (1 - (x / length))
+    #         S = N / area
+    #     return N, U, S
+    #
+    # def get_point_values(self):
+    #     input_text = self.ui.lineEdit.text()
+    #     numbers = input_text.replace(" ", "").split(",")
+    #
+    #     x = float(numbers[1])
+    #     N, U, S = self.point_values(x)
+    #
+    #
+    #     result = f"N: {str(N)}" + ", " + f"S: {str(S)}" + ", " + f"U: {str(U)}"
+    #
+    #     # result = f"N: {N[self.current_iteration - 1][0]}\n"
+    #     # result += f"U: {U[self.current_iteration - 1][0]}\n"
+    #     # result += f"S: {S[self.current_iteration - 1][0]}\n"
+    #
+    #     self.ui.result_label.setText(result)
+
+    def get_point_values(self):
+        input_text = self.ui.lineEdit.text()
+        numbers = input_text.replace(" ", "").split(",")
+
+        iteration = int(numbers[0])
+        x = float(numbers[1])
+
+        data = self.get_table_data(self.ui.tableView)
+        count = len(data)
+        sum = self.vector_delta()
+        N = np.zeros((count, 1))
+        U = np.zeros((count, 1))
+        S = np.zeros((count, 1))
+        k = 1
+
+        for i in range(len(data)):
+            area = float(data[i][0])
+            length = float(data[i][1])
+            module = float(data[i][2])
+            voltage = float(data[i][3])
+            first_node = float(data[0][4])
+            concentrated_forces = float(data[i][5])
+            distributed_forces = float(data[i][6])
+            a = sum[i + 1] - sum[i]
+            N = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (
+                    1 - ((2 * x) / length))
+            U = sum[i] + (x / length) * (sum[i + 1] - sum[i]) + (
+                    (distributed_forces * voltage * (length ** 2) * x) / (2 * module * area * length)) * (
+                              1 - (x / length))
+            S = N / area
+
+            if distributed_forces == 0:
+                N = ((module * area) / length) * a
+                U = sum[i] + (0 / length) * (sum[i + 1] - sum[i])
+                S = N / area
+
+            if k == iteration:
+                break
+            else:
+                k += 1
+
+        result = f"N: {str(N)}" + "\t" + f"S: {str(S)}" + "\t" + f"U: {str(U)}"
+        self.ui.result_label.setText(result)
+
+    # def eventFilter(self, obj, event):
+    #     if obj == self.lineEdit and event.type() == QtCore.QEvent.KeyPress:
+    #         if event.key() == QtCore.Qt.Key_Return:
+    #             self.get_point_values()
+    #         return True
+    #     return super().eventFilter(obj, event)
+
+    def point_line(self):
+        self.ui.lineEdit.setPlaceholderText("Пример: 1, 1")
+        self.ui.lineEdit.setFocusPolicy(QtCore.Qt.StrongFocus)
+        # self.ui.lineEdit.installEventFilter(self)
 
 
     def increase(self):
