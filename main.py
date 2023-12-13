@@ -124,7 +124,6 @@ class MainWindow(QtWidgets.QMainWindow):
                                     self.ui.delete_1)
                 QtWidgets.QMessageBox.information(self, "Success", "CN data opened successfully!")
 
-
     def set_table_data(self, data, tableView , headers, addButton, deleteButton):
         model = QStandardItemModel()
         model.setHorizontalHeaderLabels(headers)
@@ -138,18 +137,6 @@ class MainWindow(QtWidgets.QMainWindow):
         addButton.clicked.connect(lambda: self.add_row(model))
         deleteButton.clicked.connect(lambda: self.delete_rows(tableView, model))
 
-    def check_table_data(self):
-        data = self.get_table_data(self.ui.tableView)
-        pattern = r'^-?\d+(\.\d+)?$'
-        # pattern = r'-?[0-9]{1}(\.\d+)?\d*e?(e-)?\d*'
-
-        for row in data:
-            for value in row:
-                if not re.match(pattern, value):
-                    QtWidgets.QMessageBox.critical(self, "Error", "Invalid value: " + value)
-                    return
-        QtWidgets.QMessageBox.information(self, "Success", "Table data is valid!")
-
     def get_opora_right(self, checked):
         if checked:
             self.opora_right_exists = True
@@ -162,6 +149,42 @@ class MainWindow(QtWidgets.QMainWindow):
             self.opora_left_exists = True
         else:
             self.opora_left_exists = False
+
+    def check_table_data(self):
+        try:
+            data = self.get_table_data(self.ui.tableView)
+            if len(data) == 0:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 😊")
+                return
+            pattern = r'^-?\d+(\.\d+)?$'
+            for row in data:
+                for value in row:
+                    if float(row[0]) <= 0:
+                        QtWidgets.QMessageBox.critical(self, "Ошибка", "Площадь сечения не может быть равна: " + row[0])
+                        return
+                    if float(row[1]) <= 0:
+                        QtWidgets.QMessageBox.critical(self, "Ошибка", "Длина не может быть равна: " + row[1])
+                        return
+                    if float(row[2]) <= 0:
+                        QtWidgets.QMessageBox.critical(self, "Ошибка", "Модуль упругости не может быть равен: " + row[2])
+                        return
+                    if float(row[3]) <= 0:
+                        QtWidgets.QMessageBox.critical(self, "Ошибка", "Напряжение не может быть равно: " + row[3])
+                        return
+                    if not re.match(pattern, value):
+                        QtWidgets.QMessageBox.critical(self, "Error", "Invalid value: " + value)
+                        return
+            if self.opora_right_exists == False and self.opora_left_exists == False:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+                return
+            QtWidgets.QMessageBox.information(self, "Success", "Table data is valid!")
+
+        except Exception:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Заполните таблицу до конца 😎")
+
+
+
+
 
     # def InitWindow(self):
     #     self.title = "Отрисовка конструкции"
@@ -178,7 +201,12 @@ class MainWindow(QtWidgets.QMainWindow):
     def draw_rectangles(self):
         try:
             data = self.get_table_data(self.ui.tableView)
-            # print(first_node)
+            if len(data) == 0:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+                return
+            if self.opora_right_exists == False and self.opora_left_exists == False:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+                return
             self.ui.graphicsView.scene().clear()
 
             total_width = 0
@@ -195,7 +223,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 length = float(row[1])  # Length x
                 concentrated_forces = float(row[5]) # сосредоточенные силы
                 distributed_forces = float(row[6]) # распределенные силы
-
+                if float(row[0]) <= 0:
+                    QtWidgets.QMessageBox.critical(self, "Ошибка", "Площадь сечения не может быть равна: " + row[0])
+                    return
+                if float(row[1]) <= 0:
+                    QtWidgets.QMessageBox.critical(self, "Ошибка", "Длина не может быть равна: " + row[1])
+                    return
+                if float(row[2]) <= 0:
+                    QtWidgets.QMessageBox.critical(self, "Ошибка", "Модуль упругости не может быть равен: " + row[2])
+                    return
+                if float(row[3]) <= 0:
+                    QtWidgets.QMessageBox.critical(self, "Ошибка", "Напряжение не может быть равно: " + row[3])
+                    return
 
                 length = length * 100
                 area = area * 100
@@ -526,12 +565,23 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def processor(self):
         try:
+            data = self.get_table_data(self.ui.tableView)
+            if len(data) == 0:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+                return
+            if self.opora_right_exists == False and self.opora_left_exists == False:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+                return
+            for i in range(len(data)):
+                 voltage = float(data[i][3])
+
             A = self.matrix()
             B = self.delta()
             SUM = self.vector_delta()
             N = self.longitudinal_N()
             S = self.normal_voltage()
             U = self.movements_U()
+
             if A == [[0]]:
                 QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
             else:
@@ -541,6 +591,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 print("\nПеремещения N: ", N)
                 print("\nНормальныее напряжения σ: ", S)
                 print("\nПеремещения U: ", U)
+
                 # Запись результатов в таблицу
                 table_data = [
                     ["Продольные силы N", ', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])],
@@ -549,23 +600,33 @@ class MainWindow(QtWidgets.QMainWindow):
                 ]
 
                 model = self.ui.tableView_2.model()
+                model.removeRows(0, model.rowCount())  # Удалить все строки из таблицы
+
                 model.setRowCount(len(table_data))
                 for row, (header, value) in enumerate(table_data):
                     model.setData(model.index(row, 0), header, Qt.DisplayRole)
                     model.setData(model.index(row, 1), value, Qt.DisplayRole)
 
+                for i in range(len(S)):
+                    if S[i][0] > voltage:
+                        model.setData(model.index(1, 1), QBrush(QColor('red')), Qt.BackgroundRole)
+                    if S[i][-1] > voltage:
+                        model.setData(model.index(1, 2), QBrush(QColor('red')), Qt.BackgroundRole)
+
                 with open('results.txt', 'w', encoding='utf-8') as file:
                     file.write('Матрица реакций A: {}\n'.format(A))
                     file.write('Глобальный вектор реакций b: {}\n'.format(B))
                     file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-                    file.write('Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
-                    file.write('Нормальные напряжения σ: {}\n'.format(', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
+                    file.write(
+                            'Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
+                    file.write('Нормальные напряжения σ: {}\n'.format(
+                            ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
                     file.write('Перемещения U: {}\n'.format(', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])))
-                    QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
+
+                QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
         except Exception:
             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
-
 
     # def draw_diagrams(self):
     #     # x = [-1, -2, -3, 4, 5, 6, 7, 8, 9, 10]
@@ -605,7 +666,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def draw_u(self):
         data = self.get_table_data(self.ui.tableView)
         x_start = 0
-        # N = self.longitudinal_N()
         U = self.movements_U()
 
         scene = QtWidgets.QGraphicsScene()
@@ -646,6 +706,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.graphicsView_4.setScene(scene)
 
     def draw_diagrams(self):
+        data = self.get_table_data(self.ui.tableView)
+        if len(data) == 0:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+            return
+        if self.opora_right_exists == False and self.opora_left_exists == False:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+            return
         try:
             N = self.draw_n()
             U = self.draw_u()
@@ -653,100 +720,74 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я не поддамся 🎈")
 
-    # def point_values(self, x):
-    #     data = self.get_table_data(self.ui.tableView)
-    #     count = len(data)
-    #     sum = self.vector_delta()
-    #     N = np.zeros((count, 1))
-    #     U = np.zeros((count, 1))
-    #     S = np.zeros((count, 1))
-    #     for i in range(len(data)):
-    #         area = float(data[i][0])
-    #         length = float(data[i][1])
-    #         module = float(data[i][2])
-    #         voltage = float(data[i][3])
-    #         first_node = float(data[0][4])
-    #         concentrated_forces = float(data[i][5])  # сосредоточенные силы
-    #         distributed_forces = float(data[i][6])  # распределенные силы
-    #
-    #         a = (sum[i + 1] - sum[i])
-    #         N[i][0] = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (1 - ((2 * x) / length))
-    #         U[i][0] = sum[i] + (x / length) * (sum[i + 1] - sum[i]) + ((distributed_forces * voltage * (length ** 2) * x) / (2 * module * area * length)) * (1 - (x / length))
-    #         S = N / area
-    #     return N, U, S
-    #
-    # def get_point_values(self):
-    #     input_text = self.ui.lineEdit.text()
-    #     numbers = input_text.replace(" ", "").split(",")
-    #
-    #     x = float(numbers[1])
-    #     N, U, S = self.point_values(x)
-    #
-    #
-    #     result = f"N: {str(N)}" + ", " + f"S: {str(S)}" + ", " + f"U: {str(U)}"
-    #
-    #     # result = f"N: {N[self.current_iteration - 1][0]}\n"
-    #     # result += f"U: {U[self.current_iteration - 1][0]}\n"
-    #     # result += f"S: {S[self.current_iteration - 1][0]}\n"
-    #
-    #     self.ui.result_label.setText(result)
-
     def get_point_values(self):
         input_text = self.ui.lineEdit.text()
         numbers = input_text.replace(" ", "").split(",")
 
-        iteration = int(numbers[0])
-        x = float(numbers[1])
+        if len(numbers) != 2:
+            self.ui.result_label.setText("Некорректный ввод")
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Некорректный ввод")
+            return
 
-        data = self.get_table_data(self.ui.tableView)
-        count = len(data)
-        sum = self.vector_delta()
-        N = np.zeros((count, 1))
-        U = np.zeros((count, 1))
-        S = np.zeros((count, 1))
-        k = 1
+        try:
+            iteration = int(numbers[0])
+            x = float(numbers[1])
 
-        for i in range(len(data)):
-            area = float(data[i][0])
-            length = float(data[i][1])
-            module = float(data[i][2])
-            voltage = float(data[i][3])
-            first_node = float(data[0][4])
-            concentrated_forces = float(data[i][5])
-            distributed_forces = float(data[i][6])
-            a = sum[i + 1] - sum[i]
-            N = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (
-                    1 - ((2 * x) / length))
-            U = sum[i] + (x / length) * (sum[i + 1] - sum[i]) + (
-                    (distributed_forces * voltage * (length ** 2) * x) / (2 * module * area * length)) * (
-                              1 - (x / length))
-            S = N / area
+            data = self.get_table_data(self.ui.tableView)
+            count = len(data)
+            print(count)
+            sum = self.vector_delta()
+            N = np.zeros((count, 1))
+            U = np.zeros((count, 1))
+            S = np.zeros((count, 1))
+            k = 1
 
-            if distributed_forces == 0:
-                N = ((module * area) / length) * a
-                U = sum[i] + (0 / length) * (sum[i + 1] - sum[i])
+            # Проверка на положительность итерации
+            if iteration <= 0 or iteration > count:
+                self.ui.result_label.setText("Некорректное значение стержня 😲")
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Некорректное значение стержня 😲")
+                return
+
+            for i in range(len(data)):
+                area = float(data[i][0])
+                length = float(data[i][1])
+                module = float(data[i][2])
+                voltage = float(data[i][3])
+                first_node = float(data[0][4])
+                concentrated_forces = float(data[i][5])
+                distributed_forces = float(data[i][6])
+                a = sum[i + 1] - sum[i]
+                N = ((module * area) / length) * a + ((distributed_forces * voltage * length) / 2) * (
+                        1 - ((2 * x) / length))
+                U = sum[i] + (x / length) * (sum[i + 1] - sum[i]) + (
+                        (distributed_forces * voltage * (length ** 2) * x) / (2 * module * area * length)) * (
+                            1 - (x / length))
                 S = N / area
 
-            if k == iteration:
-                break
-            else:
-                k += 1
+                if distributed_forces == 0:
+                    N = ((module * area) / length) * a
+                    U = sum[i] + (0 / length) * (sum[i + 1] - sum[i])
+                    S = N / area
 
-        result = f"N: {str(N)}" + "\t" + f"S: {str(S)}" + "\t" + f"U: {str(U)}"
-        self.ui.result_label.setText(result)
+                if k == iteration:
+                    break
+                else:
+                    k += 1
 
-    # def eventFilter(self, obj, event):
-    #     if obj == self.lineEdit and event.type() == QtCore.QEvent.KeyPress:
-    #         if event.key() == QtCore.Qt.Key_Return:
-    #             self.get_point_values()
-    #         return True
-    #     return super().eventFilter(obj, event)
+            if x < 0 or x > length:
+                self.ui.result_label.setText("Некорректное значение длины 😳")
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Некорректное значение длины 😳")
+                return
+
+            result = f"N: {str(N)}" + "\t" + f"σ: {str(S)}" + "\t" + f"U: {str(U)}"
+            self.ui.result_label.setText(result)
+
+        except ValueError:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Я выиграл эту схватку 🎄")
 
     def point_line(self):
         self.ui.lineEdit.setPlaceholderText("Пример: 1, 1")
         self.ui.lineEdit.setFocusPolicy(QtCore.Qt.StrongFocus)
-        # self.ui.lineEdit.installEventFilter(self)
-
 
     def increase(self):
         QtWidgets.QMessageBox.critical(self, "Ошибка", "Я не хочу работать")
@@ -756,34 +797,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def close(self):
         quit()
-
-    # def increase_scale(self):
-    #     # Увеличьте масштаб прямоугольников на 1.5
-    #     self.scale(1.2, 1.2)
-    #
-    # def decrease_scale(self):
-    #     # Уменьшите масштаб прямоугольников на 0.5
-    #     self.scale(0.8, 0.8)
-
-    # def scale_rectangles(self, scale_factor):
-    #     # Получите все объекты прямоугольников на сцене
-    #     rectangles = self.ui.graphicsView.scene().items()
-    #
-    #     # Масштабируйте каждый прямоугольник
-    #     for rectangle in rectangles:
-    #         # Получите текущие размеры прямоугольника
-    #         rect = rectangle.rect()
-    #         current_width = rect.width()
-    #         current_height = rect.height()
-    #
-    #         # Масштабируйте прямоугольник с учетом коэффициента масштабирования
-    #         new_width = current_width * scale_factor
-    #         new_height = current_height * scale_factor
-    #
-    #         # Установите новые размеры прямоугольника
-    #         rectangle.setRect(rect.x(), rect.y(), new_width, new_height)
-    #
-
 
 def create_app():
     app = QtWidgets.QApplication(sys.argv)
