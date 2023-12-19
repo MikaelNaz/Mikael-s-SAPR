@@ -15,7 +15,7 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.tableView(self.ui.tableView, ["Площадь сечения", "Длина", "Модуль упругости", "Напряжение", "Первый узел", "Сосредоточенные силы", "Распределенный нагрузки"], self.ui.add_1, self.ui.delete_1)
+        self.tableView(self.ui.tableView, ["Площадь сечения", "Длина", "Модуль упругости", "Напряжение", "Первый узел", "Сосредоточенные силы", "Распределенные нагрузки"], self.ui.add_1, self.ui.delete_1)
         self.ui.save_1.clicked.connect(self.save_table_data)
         self.ui.save_3.clicked.connect(self.check_table_data)
         self.ui.opora_left.stateChanged.connect(self.get_opora_left)
@@ -29,8 +29,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.open_1.clicked.connect(self.open_table_data)
         self.ui.action_5.triggered.connect(self.close)
         self.ui.processor.clicked.connect(self.processor)
-        # self.ui.zoom_1.clicked.connect(self.increase)
-        # self.ui.zoom_2.clicked.connect(self.decrease)
         self.ui.tableView.setColumnWidth(5, 150)
         self.ui.tableView.setColumnWidth(6, 200)
         self.opora_right_exists = False
@@ -143,7 +141,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             self.opora_right_exists = False
 
-
     def get_opora_left(self, checked):
         if checked:
             self.opora_left_exists = True
@@ -182,22 +179,6 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception:
             QtWidgets.QMessageBox.critical(self, "Ошибка", "Заполните таблицу до конца 😎")
 
-
-
-
-
-    # def InitWindow(self):
-    #     self.title = "Отрисовка конструкции"
-    #     self.top = 100
-    #     self.left = 100
-    #     self.width = 500
-    #     self.height = 500
-    #     self.setWindowIcon(QtGui.QIcon("icon.png"))
-    #     self.setWindowTitle(self.title)
-    #     self.setGeometry(self.top, self.left, self.width, self.height)
-    #     self.show()
-
-
     def draw_rectangles(self):
         try:
             data = self.get_table_data(self.ui.tableView)
@@ -211,7 +192,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
             total_width = 0
             for row in data:
-                length = float(row[1])  # Length
+                length = float(row[1])
                 total_width += length
 
             x = self.ui.graphicsView.width() / 2 - total_width / 2
@@ -248,7 +229,6 @@ class MainWindow(QtWidgets.QMainWindow):
                 rectangle.setPen(pen)
                 rectangle.setBrush(brush)
 
-
                 # Рисование распределенной силы всех узлов, кроме первого
                 if distributed_forces >= 1:
                     koe = x
@@ -261,7 +241,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         line_three_0.setPen(pen)
                         line_three_1.setPen(pen)
                         line_three_2.setPen(pen)
-                        line_three_0.setZValue(1)  # Set higher Z value for foreground
+                        line_three_0.setZValue(1)  # Отрисовка поверх уже существующих
                         line_three_1.setZValue(1)
                         line_three_2.setZValue(1)
                         pen.setWidth(3)
@@ -282,7 +262,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         line_three_0.setPen(pen)
                         line_three_1.setPen(pen)
                         line_three_2.setPen(pen)
-                        line_three_0.setZValue(1)  # Set higher Z value for foreground
+                        line_three_0.setZValue(1)
                         line_three_1.setZValue(1)
                         line_three_2.setZValue(1)
                         self.ui.graphicsView.scene().addItem((line_three_0))
@@ -304,7 +284,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     line_one_0.setPen(pen)
                     line_one_1.setPen(pen)
                     line_one_2.setPen(pen)
-                    line_one_0.setZValue(1)  # Set higher Z value for foreground
+                    line_one_0.setZValue(1)
                     line_one_1.setZValue(1)
                     line_one_2.setZValue(1)
                     self.ui.graphicsView.scene().addItem((line_one_0))
@@ -321,7 +301,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     line_one_0.setPen(pen)
                     line_one_1.setPen(pen)
                     line_one_2.setPen(pen)
-                    line_one_0.setZValue(1)  # Set higher Z value for foreground
+                    line_one_0.setZValue(1)
                     line_one_1.setZValue(1)
                     line_one_2.setZValue(1)
                     self.ui.graphicsView.scene().addItem((line_one_0))
@@ -375,7 +355,6 @@ class MainWindow(QtWidgets.QMainWindow):
                     post_koef_1 += 10
                     self.ui.graphicsView.scene().addItem((line_four_1))
 
-
                 #Рисование сосредоточенной силы первого узла
             first_node = float(data[0][4])
             if first_node >= 1:
@@ -390,7 +369,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 line_two_0.setPen(pen)
                 line_two_1.setPen(pen)
                 line_two_2.setPen(pen)
-                line_two_0.setZValue(1)  # Set higher Z value for foreground
+                line_two_0.setZValue(1)
                 line_two_1.setZValue(1)
                 line_two_2.setZValue(1)
                 self.ui.graphicsView.scene().addItem((line_two_0))
@@ -415,7 +394,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         except Exception:
             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня не сломаете 🚀")
-
 
     # Матрица реакций
     def matrix(self):
@@ -443,7 +421,6 @@ class MainWindow(QtWidgets.QMainWindow):
             A[count - 1][count - 1] = 1
             A[count - 1][count - 2] = 0
             A[count - 2][count - 1] = 0
-        # print('Матрица реакций A: ', A)
         return A
 
     # Верно
@@ -525,7 +502,6 @@ class MainWindow(QtWidgets.QMainWindow):
             area = float(data[i][0])
             longitudinal_N[i] /= area
             longitudinal_N[i] /= area
-
         # print("\nНормальное напряжение σ: ", longitudinal_N)
         return longitudinal_N
 
@@ -563,72 +539,139 @@ class MainWindow(QtWidgets.QMainWindow):
                                       1 - (j / (point_count - 1)))
         return U
 
+    # def processor(self):
+    #     try:
+    #         data = self.get_table_data(self.ui.tableView)
+    #         if len(data) == 0:
+    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+    #             return
+    #         if self.opora_right_exists == False and self.opora_left_exists == False:
+    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+    #             return
+    #         for i in range(len(data)):
+    #              voltage = float(data[i][3])
+    #
+    #         A = self.matrix()
+    #         B = self.delta()
+    #         SUM = self.vector_delta()
+    #         N = self.longitudinal_N()
+    #         S = self.normal_voltage()
+    #         U = self.movements_U()
+    #
+    #         if A == [[0]]:
+    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
+    #         else:
+    #             print('Матрица реакций A: ', A)
+    #             print("\nГлобальный вектор реакций b:", B)
+    #             print("\nГлобальный вектор перемещений Δ:", SUM)
+    #             print("\nПеремещения N: ", N)
+    #             print("\nНормальныее напряжения σ: ", S)
+    #             print("\nПеремещения U: ", U)
+    #
+    #             # Запись результатов в таблицу
+    #             table_data = [
+    #                 ["Продольные силы N", ', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])],
+    #                 ["Нормальные напряжения σ", ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])],
+    #                 ["Перемещения U", ', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])]
+    #             ]
+    #
+    #             model = self.ui.tableView_2.model()
+    #             model.removeRows(0, model.rowCount())  # Удалить все строки из таблицы
+    #
+    #             model.setRowCount(len(table_data))
+    #             for row, (header, value) in enumerate(table_data):
+    #                 model.setData(model.index(row, 0), header, Qt.DisplayRole)
+    #                 model.setData(model.index(row, 1), value, Qt.DisplayRole)
+    #
+    #             for i in range(len(S)):
+    #                 if S[i][0] > voltage:
+    #                     model.setData(model.index(1, 1), QBrush(QColor('red')), Qt.BackgroundRole)
+    #                 if S[i][-1] > voltage:
+    #                     model.setData(model.index(1, 2), QBrush(QColor('red')), Qt.BackgroundRole)
+    #
+    #             with open('results.txt', 'w', encoding='utf-8') as file:
+    #                 file.write('Матрица реакций A: {}\n'.format(A))
+    #                 file.write('Глобальный вектор реакций b: {}\n'.format(B))
+    #                 file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
+    #                 file.write(
+    #                         'Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
+    #                 file.write('Нормальные напряжения σ: {}\n'.format(
+    #                         ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
+    #                 file.write('Перемещения U: {}\n'.format(', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])))
+    #
+    #             QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
+    #
+    #     except Exception:
+    #         QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
+
     def processor(self):
-        try:
-            data = self.get_table_data(self.ui.tableView)
-            if len(data) == 0:
-                QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
-                return
-            if self.opora_right_exists == False and self.opora_left_exists == False:
-                QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
-                return
-            for i in range(len(data)):
-                 voltage = float(data[i][3])
+        # try:
+        data = self.get_table_data(self.ui.tableView)
+        if len(data) == 0:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+            return
 
-            A = self.matrix()
-            B = self.delta()
-            SUM = self.vector_delta()
-            N = self.longitudinal_N()
-            S = self.normal_voltage()
-            U = self.movements_U()
+        if self.opora_right_exists == False and self.opora_left_exists == False:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+            return
 
-            if A == [[0]]:
-                QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
-            else:
-                print('Матрица реакций A: ', A)
-                print("\nГлобальный вектор реакций b:", B)
-                print("\nГлобальный вектор перемещений Δ:", SUM)
-                print("\nПеремещения N: ", N)
-                print("\nНормальныее напряжения σ: ", S)
-                print("\nПеремещения U: ", U)
+        for i in range(len(data)):
+            voltage = float(data[i][3])
 
-                # Запись результатов в таблицу
-                table_data = [
-                    ["Продольные силы N", ', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])],
-                    ["Нормальные напряжения σ", ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])],
-                    ["Перемещения U", ', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])]
-                ]
+        A = self.matrix()
+        B = self.delta()
+        SUM = self.vector_delta()
+        N = self.longitudinal_N()
+        S = self.normal_voltage()
+        U = self.movements_U()
 
-                model = self.ui.tableView_2.model()
-                model.removeRows(0, model.rowCount())  # Удалить все строки из таблицы
+        if A == [[0]]:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
+        else:
+            print('Матрица реакций A: ', A)
+            print("\nГлобальный вектор реакций b:", B)
+            print("\nГлобальный вектор перемещений Δ:", SUM)
+            print("\nПеремещения N: ", N)
+            print("\nНормальные напряжения σ: ", S)
+            print("\nПеремещения U: ", U)
 
-                model.setRowCount(len(table_data))
+            table_data = []
+            for i in range(len(N)):
+                table_data.append(["Продольные силы N[{}]".format(i + 1), (N[i][0], N[i][-1])])
+            for i in range(len(S)):
+                table_data.append(["Нормальные напряжения σ[{}]".format(i + 1), (S[i][0], S[i][-1])])
+            for i in range(len(U)):
+                table_data.append(["Перемещения U[{}]".format(i + 1), (U[i][0], U[i][-1])])
+
+            model = self.ui.tableView_2.model()
+            model.removeRows(0, model.rowCount())
+            model.setRowCount(len(table_data))
+            for row, data in enumerate(table_data):
+                header = data[0]
+                values = ', '.join(map(str, data[1:]))
+                model.setData(model.index(row, 0), header, Qt.DisplayRole)
+                model.setData(model.index(row, 1), values, Qt.DisplayRole)
+                if header.startswith("Нормальные напряжения σ"):
+                    for i in range(len(S)):
+                        if S[i][0] > voltage:
+                            model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+                        if S[i][-1] > voltage:
+                            model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+
+            with open('results.txt', 'w', encoding='utf-8') as file:
+                file.write('Матрица реакций A: {}\n'.format(A))
+                file.write('Глобальный вектор реакций b: {}\n'.format(B))
+                file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
+                file.write('Результаты расчетов:\n')
                 for row, (header, value) in enumerate(table_data):
-                    model.setData(model.index(row, 0), header, Qt.DisplayRole)
-                    model.setData(model.index(row, 1), value, Qt.DisplayRole)
+                    file.write('{}: {}\n'.format(header, value))
 
-                for i in range(len(S)):
-                    if S[i][0] > voltage:
-                        model.setData(model.index(1, 1), QBrush(QColor('red')), Qt.BackgroundRole)
-                    if S[i][-1] > voltage:
-                        model.setData(model.index(1, 2), QBrush(QColor('red')), Qt.BackgroundRole)
+            QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
-                with open('results.txt', 'w', encoding='utf-8') as file:
-                    file.write('Матрица реакций A: {}\n'.format(A))
-                    file.write('Глобальный вектор реакций b: {}\n'.format(B))
-                    file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-                    file.write(
-                            'Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
-                    file.write('Нормальные напряжения σ: {}\n'.format(
-                            ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
-                    file.write('Перемещения U: {}\n'.format(', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])))
+        # except Exception:
+        #     QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
 
-                QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
-
-        except Exception:
-            QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
-
-    # def draw_diagrams(self):
+    # def draw_diagrams(self): # проверка на работоспособность
     #     # x = [-1, -2, -3, 4, 5, 6, 7, 8, 9, 10]
     #     # y = [-30, -32, -34, -32, -33, -31, -29, 32, 35, 45]
     #     x = [0, 2]
@@ -657,8 +700,14 @@ class MainWindow(QtWidgets.QMainWindow):
             x = np.linspace(x_start, x_start + length, len(N[i]))
             y = N[i]
             plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            # Прямая для разграничения
+            vline = pg.InfiniteLine(pos=x_start + length, angle=90, movable=False)
+            plot_widget.addItem(vline)
             x_start += length
             i += 1
+
+        vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
+        plot_widget.addItem(vline_1)
 
         scene.addWidget(plot_widget)
         return self.ui.graphicsView_2.setScene(scene)
@@ -678,8 +727,14 @@ class MainWindow(QtWidgets.QMainWindow):
             x = np.linspace(x_start, x_start + length, len(U[i]))
             y = U[i]
             plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            # Прямая для отделения
+            vline = pg.InfiniteLine(pos=x_start + length, angle=90, movable=False)
+            plot_widget.addItem(vline)
             x_start += length
             i += 1
+
+        vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
+        plot_widget.addItem(vline_1)
 
         scene.addWidget(plot_widget)
         self.ui.graphicsView_3.setScene(scene)
@@ -699,8 +754,14 @@ class MainWindow(QtWidgets.QMainWindow):
             x = np.linspace(x_start, x_start + length, len(S[i]))
             y = S[i]
             plot_widget.plot(x, y, pen=pg.mkPen('b', width=2))
+            # Прямая для отделения
+            vline = pg.InfiniteLine(pos=x_start + length, angle=90, movable=False)
+            plot_widget.addItem(vline)
             x_start += length
             i += 1
+
+        vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
+        plot_widget.addItem(vline_1)
 
         scene.addWidget(plot_widget)
         self.ui.graphicsView_4.setScene(scene)
