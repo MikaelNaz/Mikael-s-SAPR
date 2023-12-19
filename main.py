@@ -8,7 +8,6 @@ import sys
 import os
 import re
 import numpy as np
-# import cv2
 
 class MainWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -551,7 +550,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 return
 
             for i in range(len(data)):
-                voltage = float(data[i][3])
+                voltage = float(data[i][3]) + 0.001
 
             A = self.matrix()
             B = self.delta()
@@ -588,10 +587,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     model.setData(model.index(row, 1), values, Qt.DisplayRole)
                     if header.startswith("Нормальные напряжения σ"):
                         for i in range(len(S)):
-                            if S[i][0] > voltage:
-                                model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
-                            if S[i][-1] > voltage:
-                                model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+                            if float(S[i][0]) + 0.001 > voltage:
+                                model.setData(model.index(row, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+                            if float(S[i][-1]) + 0.001 > voltage:
+                                model.setData(model.index(row, 1), QBrush(QColor("red")), Qt.BackgroundRole)
 
                 with open('results.txt', 'w', encoding='utf-8') as file:
                     file.write('Матрица реакций A: {}\n'.format(A))
