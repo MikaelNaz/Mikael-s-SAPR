@@ -539,137 +539,72 @@ class MainWindow(QtWidgets.QMainWindow):
                                       1 - (j / (point_count - 1)))
         return U
 
-    # def processor(self):
-    #     try:
-    #         data = self.get_table_data(self.ui.tableView)
-    #         if len(data) == 0:
-    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
-    #             return
-    #         if self.opora_right_exists == False and self.opora_left_exists == False:
-    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
-    #             return
-    #         for i in range(len(data)):
-    #              voltage = float(data[i][3])
-    #
-    #         A = self.matrix()
-    #         B = self.delta()
-    #         SUM = self.vector_delta()
-    #         N = self.longitudinal_N()
-    #         S = self.normal_voltage()
-    #         U = self.movements_U()
-    #
-    #         if A == [[0]]:
-    #             QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
-    #         else:
-    #             print('Матрица реакций A: ', A)
-    #             print("\nГлобальный вектор реакций b:", B)
-    #             print("\nГлобальный вектор перемещений Δ:", SUM)
-    #             print("\nПеремещения N: ", N)
-    #             print("\nНормальныее напряжения σ: ", S)
-    #             print("\nПеремещения U: ", U)
-    #
-    #             # Запись результатов в таблицу
-    #             table_data = [
-    #                 ["Продольные силы N", ', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])],
-    #                 ["Нормальные напряжения σ", ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])],
-    #                 ["Перемещения U", ', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])]
-    #             ]
-    #
-    #             model = self.ui.tableView_2.model()
-    #             model.removeRows(0, model.rowCount())  # Удалить все строки из таблицы
-    #
-    #             model.setRowCount(len(table_data))
-    #             for row, (header, value) in enumerate(table_data):
-    #                 model.setData(model.index(row, 0), header, Qt.DisplayRole)
-    #                 model.setData(model.index(row, 1), value, Qt.DisplayRole)
-    #
-    #             for i in range(len(S)):
-    #                 if S[i][0] > voltage:
-    #                     model.setData(model.index(1, 1), QBrush(QColor('red')), Qt.BackgroundRole)
-    #                 if S[i][-1] > voltage:
-    #                     model.setData(model.index(1, 2), QBrush(QColor('red')), Qt.BackgroundRole)
-    #
-    #             with open('results.txt', 'w', encoding='utf-8') as file:
-    #                 file.write('Матрица реакций A: {}\n'.format(A))
-    #                 file.write('Глобальный вектор реакций b: {}\n'.format(B))
-    #                 file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-    #                 file.write(
-    #                         'Продольные силы N: {}\n'.format(', '.join([', '.join(map(str, [n[0], n[-1]])) for n in N])))
-    #                 file.write('Нормальные напряжения σ: {}\n'.format(
-    #                         ', '.join([', '.join(map(str, [s[0], s[-1]])) for s in S])))
-    #                 file.write('Перемещения U: {}\n'.format(', '.join([', '.join(map(str, [u[0], u[-1]])) for u in U])))
-    #
-    #             QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
-    #
-    #     except Exception:
-    #         QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
-
     def processor(self):
-        # try:
-        data = self.get_table_data(self.ui.tableView)
-        if len(data) == 0:
-            QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
-            return
+        try:
+            data = self.get_table_data(self.ui.tableView)
+            if len(data) == 0:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Задайте конструкцию! 🙃")
+                return
 
-        if self.opora_right_exists == False and self.opora_left_exists == False:
-            QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
-            return
+            if self.opora_right_exists == False and self.opora_left_exists == False:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Не заданы опоры! 🥱")
+                return
 
-        for i in range(len(data)):
-            voltage = float(data[i][3])
+            for i in range(len(data)):
+                voltage = float(data[i][3])
 
-        A = self.matrix()
-        B = self.delta()
-        SUM = self.vector_delta()
-        N = self.longitudinal_N()
-        S = self.normal_voltage()
-        U = self.movements_U()
+            A = self.matrix()
+            B = self.delta()
+            SUM = self.vector_delta()
+            N = self.longitudinal_N()
+            S = self.normal_voltage()
+            U = self.movements_U()
 
-        if A == [[0]]:
-            QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
-        else:
-            print('Матрица реакций A: ', A)
-            print("\nГлобальный вектор реакций b:", B)
-            print("\nГлобальный вектор перемещений Δ:", SUM)
-            print("\nПеремещения N: ", N)
-            print("\nНормальные напряжения σ: ", S)
-            print("\nПеремещения U: ", U)
+            if A == [[0]]:
+                QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня, возможно, никогда не сломаете 😊")
+            else:
+                print('Матрица реакций A: ', A)
+                print("\nГлобальный вектор реакций b:", B)
+                print("\nГлобальный вектор перемещений Δ:", SUM)
+                print("\nПеремещения N: ", N)
+                print("\nНормальные напряжения σ: ", S)
+                print("\nПеремещения U: ", U)
 
-            table_data = []
-            for i in range(len(N)):
-                table_data.append(["Продольные силы N[{}]".format(i + 1), (N[i][0], N[i][-1])])
-            for i in range(len(S)):
-                table_data.append(["Нормальные напряжения σ[{}]".format(i + 1), (S[i][0], S[i][-1])])
-            for i in range(len(U)):
-                table_data.append(["Перемещения U[{}]".format(i + 1), (U[i][0], U[i][-1])])
+                table_data = []
+                for i in range(len(N)):
+                    table_data.append(["Продольные силы N[{}]".format(i + 1), (N[i][0], N[i][-1])])
+                for i in range(len(S)):
+                    table_data.append(["Нормальные напряжения σ[{}]".format(i + 1), (S[i][0], S[i][-1])])
+                for i in range(len(U)):
+                    table_data.append(["Перемещения U[{}]".format(i + 1), (U[i][0], U[i][-1])])
 
-            model = self.ui.tableView_2.model()
-            model.removeRows(0, model.rowCount())
-            model.setRowCount(len(table_data))
-            for row, data in enumerate(table_data):
-                header = data[0]
-                values = ', '.join(map(str, data[1:]))
-                model.setData(model.index(row, 0), header, Qt.DisplayRole)
-                model.setData(model.index(row, 1), values, Qt.DisplayRole)
-                if header.startswith("Нормальные напряжения σ"):
-                    for i in range(len(S)):
-                        if S[i][0] > voltage:
-                            model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
-                        if S[i][-1] > voltage:
-                            model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+                model = self.ui.tableView_2.model()
+                model.removeRows(0, model.rowCount())
+                model.setRowCount(len(table_data))
+                for row, data in enumerate(table_data):
+                    header = data[0]
+                    values = ', '.join(map(str, data[1:]))
+                    model.setData(model.index(row, 0), header, Qt.DisplayRole)
+                    model.setData(model.index(row, 1), values, Qt.DisplayRole)
+                    if header.startswith("Нормальные напряжения σ"):
+                        for i in range(len(S)):
+                            if S[i][0] > voltage:
+                                model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
+                            if S[i][-1] > voltage:
+                                model.setData(model.index(row + i, 1), QBrush(QColor("red")), Qt.BackgroundRole)
 
-            with open('results.txt', 'w', encoding='utf-8') as file:
-                file.write('Матрица реакций A: {}\n'.format(A))
-                file.write('Глобальный вектор реакций b: {}\n'.format(B))
-                file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
-                file.write('Результаты расчетов:\n')
-                for row, (header, value) in enumerate(table_data):
-                    file.write('{}: {}\n'.format(header, value))
+                with open('results.txt', 'w', encoding='utf-8') as file:
+                    file.write('Матрица реакций A: {}\n'.format(A))
+                    file.write('Глобальный вектор реакций b: {}\n'.format(B))
+                    file.write('Глобальный вектор перемещений Δ: {}\n'.format(SUM))
+                    file.write('Результаты расчетов:\n')
+                    for row, (header, value) in enumerate(table_data):
+                        file.write('{}: {}\n'.format(header, value))
 
-            QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
+                QtWidgets.QMessageBox.information(self, "Sucess", "Результаты расчетов записаны в файл results.txt")
 
-        # except Exception:
-        #     QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
+        except Exception:
+            QtWidgets.QMessageBox.critical(self, "Ошибка", "Вы меня почти сломали, но я выдержал этот натиск 😎")
 
     # def draw_diagrams(self): # проверка на работоспособность
     #     # x = [-1, -2, -3, 4, 5, 6, 7, 8, 9, 10]
