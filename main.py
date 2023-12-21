@@ -643,6 +643,9 @@ class MainWindow(QtWidgets.QMainWindow):
         vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
         plot_widget.addItem(vline_1)
 
+        vline_2 = pg.InfiniteLine(angle=0, movable=False)
+        plot_widget.addItem(vline_2)
+
         scene.addWidget(plot_widget)
         return self.ui.graphicsView_2.setScene(scene)
 
@@ -670,6 +673,9 @@ class MainWindow(QtWidgets.QMainWindow):
         vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
         plot_widget.addItem(vline_1)
 
+        vline_2 = pg.InfiniteLine(angle=0, movable=False)
+        plot_widget.addItem(vline_2)
+
         scene.addWidget(plot_widget)
         self.ui.graphicsView_3.setScene(scene)
 
@@ -696,6 +702,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         vline_1 = pg.InfiniteLine(pos=0, angle=90, movable=False)
         plot_widget.addItem(vline_1)
+
+        vline_2 = pg.InfiniteLine(angle=0, movable=False)
+        plot_widget.addItem(vline_2)
 
         scene.addWidget(plot_widget)
         self.ui.graphicsView_4.setScene(scene)
